@@ -1,0 +1,30 @@
+mongobeancpp 0.0.1
+
+Mongobean is intended to be a super light weight alternative to MongoDB ODMs. It adds before_insert and after_insert methods (eventually wrapping other methods, as well).
+You can use these methods to, for example, easily bind validation and logging functionality to the mongodb api. 
+
+  Requires Mongo C++ Driver (which requires Boost).
+
+example usage (see tests for more examples):
+
+struct log{
+  void operator()(const std::string &ns, mongo::BSONObj obj, int flags){	
+    std::cout<<"inserting "<<obj<<std::endl;
+  }      
+}logger;
+
+mongo::BSONObjBuilder b;
+b.append("name", "Joe");
+mongo::BSONObj obj = b.obj();
+MongoBean::InsertObjWrapperFn log_before_cb(boost::ref(logger));
+MongoBeanDBClientConnection c;
+c.connect("localhost");
+c.before_insert(log_before_cb); 
+c.insert("test.tests", obj); 
+
+//$ g++ -g ./src/mongobean.cpp ./tests/test.cpp -pthread -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_program_options-mt -lboost_system-mt -lboost_unit_test_framework-mt -o mongobean_test
+//$ ./mongobean_test
+//$ inserting {"name": "Joe"}
+
+
+
