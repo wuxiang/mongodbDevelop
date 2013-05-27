@@ -7,9 +7,9 @@ int main()
 	mongo*  conn = mongo_create();
 
 	mongoConnect(conn);
-	bsonInsertUser(conn);
+	//bsonInsertUser(conn);
 	//mongoQuerySimple(conn);
-	//mongoUpdate(conn);
+	mongoUpdate(conn);
 
 	mongo_destroy(conn);
 	return 0;

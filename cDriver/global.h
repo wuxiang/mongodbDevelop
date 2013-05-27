@@ -141,6 +141,8 @@ void mongoQuerySimple(mongo* conn)
 
 void mongoQueryComplex(mongo* conn)
 {
+	/*
+	 * just sample 1
 	bson query[1];
 	bson_init(query);
 	bson_append_string(query, "UName", "wuxiang");
@@ -160,11 +162,37 @@ void mongoQueryComplex(mongo* conn)
 
 	bson_destroy(query);
 	mongo_cursor_destroy(cursor);
+	*/
+
+	bson query[1];
+	bson_init(query);
+	{
+		bson_append_start_array(query, "information");
+		{
+			bson_append_start_object(query, "0");
+			bson_append_int(query, "sort", 1);
+			bson_append_int(query, "group", 1);
+			bson_append_finish_object(query);
+		}
+		bson_append_finish_array(query);
+	}
+	bson_finish(query);
+
+	mongo_cursor cursor[1];
+	mongo_cursor_init(cursor, conn, "test.information");
+	mongo_cursor_set_query(cursor, query);
+
+	while (mongo_cursor_next(cursor) == MONGO_OK)
+	{
+		bson_print(&(cursor->current));
+	}
+
+	mongo_cursor_destroy(cursor);
+	bson_destroy(query);
 }
 
 void mongoUpdate(mongo* conn)
 {
-	return;
 }
 
 #endif //_GLOBAL_H_
