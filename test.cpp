@@ -1,5 +1,5 @@
 #include "../include/mongobean.h"
-#define BOOST_TEST_DYN_LINK  
+#define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
@@ -36,7 +36,7 @@ mongo::BSONObj get_test_obj1(){
   mongo::BSONObjBuilder b;
   b.append("name", "Joe");
   b.append("age", 33);
-  return b.obj();  
+  return b.obj();
 }
 
 class MockMongoBeanDBClientConnection : public MongoBeanDBClientConnection{
@@ -47,7 +47,7 @@ class MockMongoBeanDBClientConnection : public MongoBeanDBClientConnection{
   void base_insert(const std::string &ns, mongo::BSONObj obj, int flags=0){
     insert_called = true;
   }
-  void base_insert(const std::string &ns, const std::vector<mongo::BSONObj>& objs, 
+  void base_insert(const std::string &ns, const std::vector<mongo::BSONObj>& objs,
 		   int flags=0){
     v_insert_called = true;
   }
@@ -55,7 +55,7 @@ class MockMongoBeanDBClientConnection : public MongoBeanDBClientConnection{
 
 
 BOOST_AUTO_TEST_CASE( mongobean_should_set_wrappers )
-{  
+{
   t_functor before_fn;
   t_functor after_fn;
   MongoBean::InsertObjWrapperFn test_before_functor(boost::ref(before_fn));
@@ -74,12 +74,12 @@ BOOST_AUTO_TEST_CASE( mongobean_should_set_wrappers )
   BOOST_CHECK_EQUAL( after_fn.m_obj, test_obj);
   BOOST_CHECK_EQUAL( after_fn.m_flags, 0);
   BOOST_CHECK_EQUAL( after_fn.called, true);
-  BOOST_CHECK_EQUAL( c.insert_called, true);  
+  BOOST_CHECK_EQUAL( c.insert_called, true);
 }
 
 
 BOOST_AUTO_TEST_CASE( mongobean_should_set_wrappers_insert_multiple_objs)
-{  
+{
   t_v_functor before_fn;
   t_v_functor after_fn;
   MongoBean::InsertObjsWrapperFn test_before_functor(boost::ref(before_fn));
@@ -101,5 +101,5 @@ BOOST_AUTO_TEST_CASE( mongobean_should_set_wrappers_insert_multiple_objs)
   BOOST_CHECK( after_fn.m_objs == bv);
   BOOST_CHECK_EQUAL( after_fn.m_flags, 0);
   BOOST_CHECK_EQUAL( after_fn.called, true);
-  BOOST_CHECK_EQUAL( c.v_insert_called, true);  
+  BOOST_CHECK_EQUAL( c.v_insert_called, true);
 }
