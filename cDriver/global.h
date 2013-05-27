@@ -6,7 +6,8 @@
 
 void mongoConnect(mongo* conn)
 {
-	int status = mongo_connect(conn, "127.0.0.1", 27017);
+	mongo_init(conn);
+	int status = mongo_client(conn, "127.0.0.1", 27017);
 	if (status != MONGO_OK)
 	{
 		switch (conn->err)
@@ -27,7 +28,7 @@ void mongoConnect(mongo* conn)
 
 void bsonInsertUser(mongo* conn)
 {
-	bson*  bs = bson_create();
+	bson  bs[1];
 
 	/* user information
 	 *
@@ -83,20 +84,20 @@ void bsonInsertUser(mongo* conn)
 	bson_init(bs);
 	{
 		bson_append_int(bs, "NO", random());
-		bson_append_string(bs, "name", "timxie");
+		bson_append_string(bs, "name", "tomwu");
 
 		bson_append_start_array(bs, "information");
 		{
 			bson_append_start_object(bs, "0");
-			bson_append_int(bs, "sort", 1);
+			bson_append_int(bs, "sort", 2);
 			bson_append_int(bs, "group", 1);
-			bson_append_string(bs, "data", "300701,300003,SZ8001");
+			bson_append_string(bs, "data", "500701,500003,SZ8001");
 			bson_append_finish_object(bs);
 
 			bson_append_start_object(bs, "1");
-			bson_append_int(bs, "sort", 1);
+			bson_append_int(bs, "sort", 2);
 			bson_append_int(bs, "group", 2);
-			bson_append_string(bs, "data", "300709,300103,800101");
+			bson_append_string(bs, "data", "800709,800103,800101");
 			bson_append_finish_object(bs);
 		}
 		bson_append_finish_array(bs);
@@ -107,8 +108,11 @@ void bsonInsertUser(mongo* conn)
 	{
 		printf("insert error\n");
 	}
+	else
+	{
+		printf("insert ok\n");
+	}
 
-	printf("insert ok\n");
 	bson_destroy(bs);
 }
 
@@ -167,14 +171,15 @@ void mongoQueryComplex(mongo* conn)
 	bson query[1];
 	bson_init(query);
 	{
-		bson_append_start_array(query, "information");
-		{
-			bson_append_start_object(query, "0");
-			bson_append_int(query, "sort", 1);
-			bson_append_int(query, "group", 1);
-			bson_append_finish_object(query);
-		}
-		bson_append_finish_array(query);
+		bson_append_int(query, "information.sort", 1);
+		//bson_append_start_array(query, "information");
+		//{
+		//	bson_append_start_object(query, "0");
+		//	bson_append_int(query, "sort", 1);
+		//	bson_append_int(query, "group", 1);
+		//	bson_append_finish_object(query);
+		//}
+		//bson_append_finish_array(query);
 	}
 	bson_finish(query);
 
@@ -184,6 +189,7 @@ void mongoQueryComplex(mongo* conn)
 
 	while (mongo_cursor_next(cursor) == MONGO_OK)
 	{
+		printf("+++++++++++++++object+++++++++++++\n");
 		bson_print(&(cursor->current));
 	}
 

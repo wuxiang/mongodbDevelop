@@ -4,12 +4,13 @@
 
 int main()
 {
-	mongo*  conn = mongo_create();
+	mongo  conn[1];
 
 	mongoConnect(conn);
-	//bsonInsertUser(conn);
+	bsonInsertUser(conn);
 	//mongoQuerySimple(conn);
-	mongoUpdate(conn);
+	mongoQueryComplex(conn);
+	//mongoUpdate(conn);
 
 	mongo_destroy(conn);
 	return 0;
