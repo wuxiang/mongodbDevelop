@@ -7,10 +7,10 @@ int main()
 	mongo  conn[1];
 
 	mongoConnect(conn);
-	bsonInsertUser(conn);
-	//mongoQuerySimple(conn);
+	//bsonInsertUser(conn);
+	mongoQuerySimple(conn);
 	mongoQueryComplex(conn);
-	//mongoUpdate(conn);
+	mongoUpdate(conn);
 
 	mongo_destroy(conn);
 	return 0;
