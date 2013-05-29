@@ -221,14 +221,47 @@ void mongoQueryComplex(mongo* conn)
 	bson_destroy(query);
 }
 
+void queryTestSetField(mongo* conn)
+{
+	bson query[1];
+	bson_init(query);
+	{
+		bson_append_string(query, "name", "timxie");
+	}
+	bson_finish(query);
+
+	bson  field[1];
+	bson_init(field);
+	{
+		bson_append_int(field, "NO", 1);
+		bson_append_int(field, "information", 1);
+	}
+	bson_finish(field);
+
+	mongo_cursor cursor[1];
+	mongo_cursor_init(cursor, conn, "test.information");
+	mongo_cursor_set_query(cursor, query);
+	mongo_cursor_set_fields(cursor, field);
+
+	while (mongo_cursor_next(cursor) == MONGO_OK)
+	{
+		printf("+++++++++++++++object+++++++++++++\n");
+		bson_print(&(cursor->current));
+	}
+
+	mongo_cursor_destroy(cursor);
+	bson_destroy(field);
+	bson_destroy(query);
+}
+
 void mongoUpdate(mongo* conn)
 {
 	printf("======================mongoUpdate====================\n");
 	bson  query;
 	bson_init(&query);
 	{
-		bson_append_int(&query, "information.sort", 1);
-		bson_append_int(&query, "information.group", 1);
+		bson_append_int(&query, "information.sort", 8);
+		bson_append_int(&query, "information.group", 8);
 	}
 	bson_finish(&query);
 
