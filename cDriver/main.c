@@ -10,7 +10,8 @@ int main()
 	//bsonInsertUser(conn);
 	//mongoQuerySimple(conn);
 	//mongoQueryComplex(conn);
-	queryTestSetField(conn);
+	//queryTestSetField(conn);
+	mongoQueryAll(conn);
 	//mongoUpdate(conn);
 
 	mongo_destroy(conn);

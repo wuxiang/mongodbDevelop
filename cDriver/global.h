@@ -119,6 +119,31 @@ void bsonInsertUser(mongo* conn)
 	bson_destroy(bs);
 }
 
+void mongoQueryAll(mongo* conn)
+{
+	printf("=====================mongoQuerySimple========================\n");
+	bson  query[1];
+	mongo_cursor cursor[1];
+
+	bson_init(query);
+	bson_finish(query);
+
+	mongo_cursor_init(cursor, conn, "SyncServerDB.AccUserCache");
+	//mongo_cursor_set_query(cursor, query);
+	mongo_cursor_set_query(cursor, NULL);
+	mongo_cursor_set_limit(cursor, 1);
+
+	int i = 0;
+	while (mongo_cursor_next(cursor) == MONGO_OK)
+	{
+		printf("times: %d\n", ++i);
+		bson_print(&(cursor->current));
+	}
+
+	mongo_cursor_destroy(cursor);
+	bson_destroy(query);
+}
+
 void mongoQuerySimple(mongo* conn)
 {
 	printf("=====================mongoQuerySimple========================\n");
