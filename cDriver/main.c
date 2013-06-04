@@ -11,7 +11,9 @@ int main()
 	//mongoQuerySimple(conn);
 	//mongoQueryComplex(conn);
 	//queryTestSetField(conn);
-	mongoQueryAll(conn);
+	//mongoQueryAll(conn);
+	//mongoDeleteArrayObj(conn);
+	appendAllTest(conn);
 	//mongoUpdate(conn);
 
 	mongo_destroy(conn);

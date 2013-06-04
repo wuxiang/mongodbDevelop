@@ -307,4 +307,87 @@ void mongoUpdate(mongo* conn)
 	}
 }
 
+void mongoDeleteArrayObj(mongo* conn)
+{
+	printf("======================mongoUpdate====================\n");
+	bson  query;
+	bson_init(&query);
+	{
+		bson_append_string(&query, "name", "tomwu");
+		//bson_append_int(&query, "information.sort", 2);
+		//bson_append_int(&query, "information.group", 1);
+		//bson_append_int(&query, "NO", 846930886);
+	}
+	bson_finish(&query);
+
+	bson  field;
+	bson_init(&field);
+	{
+		bson_append_start_object(&field, "$pull");
+		{
+			//bson_append_int(&field, "information.sort", 3); // it will not work
+			//bson_append_int(&field, "information.group", 1);// it will not work
+			bson_append_start_object(&field, "information");
+			{
+				bson_append_int(&field, "sort", 3);
+				bson_append_int(&field, "group", 2);
+			}
+			bson_append_finish_object(&field);
+		}
+		bson_append_finish_object(&field);
+	}
+	bson_finish(&field);
+
+	if (MONGO_OK == mongo_update(conn, "test.information", &query, &field, MONGO_UPDATE_UPSERT|MONGO_UPDATE_MULTI, NULL))
+	{
+		printf("update success!!!\n");
+	}
+	else
+	{
+		printf("update failed\n");
+	}
+}
+
+void appendAllTest(mongo* conn)
+{
+	bson query;
+	bson_init(&query);
+	{
+		bson_append_string(&query, "name", "tomwu");
+	}
+	bson_finish(&query);
+
+	bson  b;
+    bson_init(&b);
+	{
+		bson_append_start_object(&b, "$pushAll");
+		{
+			bson_append_start_array( &b, "information" );
+			{
+				bson_append_start_object( &b, "0" );
+				bson_append_string( &b, "name", "John Coltrane: Impressions" );
+				bson_append_int( &b, "price", 1099 );
+				bson_append_finish_object( &b );
+
+				bson_append_start_object( &b, "1" );
+				bson_append_string( &b, "name", "Larry Young: Unity" );
+				bson_append_int( &b, "price", 1199 );
+				bson_append_finish_object( &b );
+			}
+			bson_append_finish_array( &b );
+		}
+		bson_append_finish_object( &b );
+	}
+	bson_finish(&b);
+
+	if (MONGO_OK == mongo_update(conn, "test.information", &query, &b, MONGO_UPDATE_UPSERT|MONGO_UPDATE_MULTI, NULL))
+	{
+		printf("update success!!!\n");
+	}
+	else
+	{
+		printf("update failed\n");
+	}
+}
+
 #endif //_GLOBAL_H_
