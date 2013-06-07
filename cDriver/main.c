@@ -4,18 +4,19 @@
 
 int main()
 {
-	mongo  conn[1];
+	//mongo  conn[1];
 
-	mongoConnect(conn);
+	//mongoConnect(conn);
 	//bsonInsertUser(conn);
 	//mongoQuerySimple(conn);
 	//mongoQueryComplex(conn);
 	//queryTestSetField(conn);
 	//mongoQueryAll(conn);
 	//mongoDeleteArrayObj(conn);
-	appendAllTest(conn);
+	//appendAllTest(conn);
 	//mongoUpdate(conn);
 
-	mongo_destroy(conn);
+	//mongo_destroy(conn);
+	test4Project();
 	return 0;
 }

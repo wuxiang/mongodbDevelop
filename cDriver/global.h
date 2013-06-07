@@ -3,6 +3,8 @@
 #include <mongo.h>
 #include <bson.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <strings.h>
 
 void mongoConnect(mongo* conn)
 {
@@ -388,6 +390,100 @@ void appendAllTest(mongo* conn)
 	{
 		printf("update failed\n");
 	}
+}
+
+void  test4Project()
+{
+	mongo  conn[1];
+	int status = mongo_connect(conn, "127.0.0.1", 27017);
+	if (status != MONGO_OK)
+	{
+		switch (conn->err)
+		{
+			case MONGO_CONN_NO_SOCKET:
+				printf("no socket\n");
+				return;
+			case MONGO_CONN_FAIL:
+				printf("connected failed\n");
+				return;
+			case MONGO_CONN_NOT_MASTER:
+				printf("not master\n");
+		}
+		return;
+	}
+
+	printf("connect ok\n");
+
+	bson  query;
+	bson_init(&query);
+	{
+		bson_append_string(&query, "userid", "wuxiangfe");
+	}
+	bson_finish(&query);
+
+	bson field;
+	bson_init(&field);
+	{
+		bson_append_int(&field, "time", 1);
+		bson_append_int(&field, "content", 1);
+	}
+	bson_finish(&field);
+
+	mongo_cursor cursor;
+	mongo_cursor_init(&cursor, conn, "Cloud.SyncData");
+	mongo_cursor_set_query(&cursor, &query);
+	mongo_cursor_set_fields(&cursor, &field);
+
+	//bool flag = false;
+	char stk[64];
+	time_t tm = 0;
+	while (MONGO_OK == mongo_cursor_next(&cursor))
+	{
+		//bson_print(mongo_cursor_bson(&cursor));
+		bson_iterator it[1];
+
+		if (BSON_EOO != bson_find(it, mongo_cursor_bson(&cursor), "time"))
+		{
+			fprintf(stderr, "time: %ld\n", bson_iterator_time_t(it));
+		}
+
+		if (BSON_EOO != bson_find(it, mongo_cursor_bson(&cursor), "content"))
+		{
+			bson  subobj[1];
+			bson_iterator_subobject(it, subobj);
+
+			bson_iterator  subIter[1];
+			if (BSON_EOO != bson_find(subIter, subobj, "group0"))
+			{
+				fprintf(stderr, "find object!!!\n");
+				bson_iterator  subsubIter[1];
+				bson_iterator_subiterator(subIter, subsubIter);
+				while (BSON_EOO != bson_iterator_next(subsubIter))
+				{
+					bson  desObj[1];
+					bson_iterator_subobject(subsubIter, desObj);
+
+					bson_iterator  stkIte[1];
+					if (BSON_EOO != bson_find(stkIte, desObj, "data"))
+					{
+						bzero(stk, 64);
+						strcpy(stk, bson_iterator_string(stkIte));
+						tm = 0;
+						if (BSON_EOO != bson_find(stkIte, desObj, "time"))
+						{
+							tm = bson_iterator_time_t(stkIte);
+						}
+					}
+					fprintf(stderr, "data: %s,\ttime: %ld\n", stk, tm);
+				}
+			}
+		}
+
+	}
+
+	mongo_cursor_destroy(&cursor);
+	bson_destroy(&field);
+	bson_destroy(&query);
 }
 
 #endif //_GLOBAL_H_
