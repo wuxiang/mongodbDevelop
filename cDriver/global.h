@@ -88,6 +88,7 @@ void bsonInsertUser(mongo* conn)
 	 */
 	bson_init(bs);
 	{
+		bson_append_new_oid(bs, "_id");
 		bson_append_int(bs, "NO", random());
 		bson_append_string(bs, "name", "tomwu");
 
@@ -154,6 +155,7 @@ void mongoQuerySimple(mongo* conn)
 
 	bson_init(query);
 	bson_append_string(query, "UName", "wuxiang");
+	//bson_append_string(query, "UName", "wuxiangfe");
 	bson_finish(query);
 
 	mongo_cursor_init(cursor, conn, "SyncServerDB.AccUserCache");
@@ -164,7 +166,7 @@ void mongoQuerySimple(mongo* conn)
 	{
 		printf("time: +++++%d++++\n", ++i);
 		bson_iterator iter[1];
-		if (bson_find(iter, mongo_cursor_bson(cursor), "pWord"))
+		if (BSON_EOO != bson_find(iter, mongo_cursor_bson(cursor), "PWord"))
 		{
 			printf("name: %s, password: %s\n", "wuxiang", bson_iterator_string(iter));
 		}
@@ -484,6 +486,81 @@ void  test4Project()
 	mongo_cursor_destroy(&cursor);
 	bson_destroy(&field);
 	bson_destroy(&query);
+}
+
+void multiFieldUpdate()
+{
+	mongo  conn[1];
+	int status = mongo_connect(conn, "127.0.0.1", 27017);
+	if (status != MONGO_OK)
+	{
+		switch (conn->err)
+		{
+			case MONGO_CONN_NO_SOCKET:
+				printf("no socket\n");
+				return;
+			case MONGO_CONN_FAIL:
+				printf("connected failed\n");
+				return;
+			case MONGO_CONN_NOT_MASTER:
+				printf("not master\n");
+		}
+		return;
+	}
+
+	printf("connect ok\n");
+
+	bson  query;
+	bson_init(&query);
+	{
+		bson_append_string(&query, "UName", "elisonwu");
+		bson_append_int(&query, "sort", 3);
+		bson_append_int(&query, "group", 1);
+	}
+	bson_finish(&query);
+
+	bson field;
+	bson_init(&field);
+	{
+		bson_append_start_object(&field, "$pushAll");
+		{
+			bson_append_start_array(&field, "content");
+			{
+				bson_append_start_object(&field, "1");
+				{
+					bson_append_string(&field, "data", "SH88888888");
+					bson_append_time_t(&field, "time", 888888);
+				}
+				bson_append_finish_object(&field);
+
+				bson_append_start_object(&field, "2");
+				{
+					bson_append_string(&field, "data", "SZ99999999");
+					bson_append_time_t(&field, "time", 99999999);
+				}
+				bson_append_finish_object(&field);
+			}
+			bson_append_finish_array(&field);
+		}
+		bson_append_finish_object(&field);
+
+		bson_append_start_object(&field, "$set");
+		{
+			bson_append_time_t(&field, "time", 888888);
+			bson_append_string(&field, "macIP", "192.168.3.154");
+			bson_append_string(&field, "PushID", "apple");
+			bson_append_int(&field, "platform",  8);
+		}
+		bson_append_finish_object(&field);
+	}
+	bson_finish(&field);
+
+	if (MONGO_OK != mongo_update(conn, "SyncServerDB.StockData", &query, &field, MONGO_UPDATE_UPSERT | MONGO_UPDATE_MULTI, NULL))
+	{
+		fprintf(stderr, "mongodb update failed\n");
+	}
+
+	fprintf(stderr, "mongodb update success\n");
 }
 
 #endif //_GLOBAL_H_

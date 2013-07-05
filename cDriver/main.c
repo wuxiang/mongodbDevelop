@@ -4,9 +4,9 @@
 
 int main()
 {
-	//mongo  conn[1];
+	mongo  conn[1];
 
-	//mongoConnect(conn);
+	mongoConnect(conn);
 	//bsonInsertUser(conn);
 	//mongoQuerySimple(conn);
 	//mongoQueryComplex(conn);
@@ -17,6 +17,7 @@ int main()
 	//mongoUpdate(conn);
 
 	//mongo_destroy(conn);
-	test4Project();
+	//test4Project();
+	multiFieldUpdate();
 	return 0;
 }
